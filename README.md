@@ -1,5 +1,5 @@
 
-# 毕设相关论文总结
+# Thesis related to graduation project
 <!-- TOC -->
 
 - [毕设相关论文总结](#毕设相关论文总结)
