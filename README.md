@@ -2,7 +2,7 @@
 # Thesis related to graduation project
 <!-- TOC -->
 
-- [毕设相关论文总结](#毕设相关论文总结)
+- [Thesis related to graduation project](#thesis-related-to-graduation-project)
     - [衍射深度学习框架](#衍射深度学习框架)
         - [All-optical machine learning using diffractive deep neural networks](#all-optical-machine-learning-using-diffractive-deep-neural-networks)
         - [Hybrid optical-electronic convolutional neural networks with optimized diffractive optics for image classification](#hybrid-optical-electronic-convolutional-neural-networks-with-optimized-diffractive-optics-for-image-classification)
@@ -22,10 +22,16 @@
         - [Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks](#unpaired-image-to-image-translation-using-cycle-consistent-adversarial-networks)
         - [DualGAN: Unsupervised Dual Learning for Image-to-Image Translation](#dualgan-unsupervised-dual-learning-for-image-to-image-translation)
         - [Precomputed Real-Time Texture Synthesis with Markovian Generative Adversarial Networks(PatchGAN)](#precomputed-real-time-texture-synthesis-with-markovian-generative-adversarial-networkspatchgan)
+        - [Perceptual Losses for Real-Time Style Transfer and Super-Resolution](#perceptual-losses-for-real-time-style-transfer-and-super-resolution)
+        - [Perceptual Adversarial Networks for Image-to-Image Transformation](#perceptual-adversarial-networks-for-image-to-image-transformation)
+        - [Generating Images with Perceptual Similarity Metrics based on Deep Networks](#generating-images-with-perceptual-similarity-metrics-based-on-deep-networks)
     - [特殊传感器实现深度神经网络层](#特殊传感器实现深度神经网络层)
         - [ASP Vision Optically Computing the First Layer of Convolutional Neural Networks using Angle Sensitive Pixels](#asp-vision-optically-computing-the-first-layer-of-convolutional-neural-networks-using-angle-sensitive-pixels)
     - [其他](#其他)
         - [Fast Training of Convolutional Networks through FFTs](#fast-training-of-convolutional-networks-through-ffts)
+        - [Perceptual-Sensitive GAN for Generating Adversarial Patches](#perceptual-sensitive-gan-for-generating-adversarial-patches)
+        - [Perceptual Generative Adversarial Networks for Small Object Detection](#perceptual-generative-adversarial-networks-for-small-object-detection)
+    - [超表面(Metasurface)](#超表面metasurface)
 
 <!-- /TOC -->
 ## 衍射深度学习框架
@@ -350,6 +356,34 @@ Wasserstein GAN 损失：<br>
 其中 $\phi$ 表示 sampled patches 即特征图块。$E_t$ 表示 texture loss，$E_c$ 表示 content loss， $\Upsilon(x)$是一个平滑变量( smoothness prior for pixels)，可以进行纹理的随机合成。<br>
 $s_i$表示第i个neural patch的分类得分，N为patch总数。$E_t$表达式见上面式2，而$E_c$就是 Mean Square Error。
 
+### Perceptual Losses for Real-Time Style Transfer and Super-Resolution
+
+本文相比于其他图像翻译、风格迁移、超分辨率任务中，对抗生成网络采用的 pixel-wise loss，如 L1，L2 loss，本文提出一种新的 perceptual loss ，度量损失时，它不是针对像素级的生成图像与目标图像相似度度量，而是针对生成图像与目标图像从深度卷积神经网络中提取的特征相似度度量。perceptual loss 分为两个部分，一个是 Feature Reconstruction Loss 主要针对保留物体内容和整体空间结构，一个是 Style Reconstruction Loss 主要针对保留风格迁移中的风格信息，如物体颜色、材质，而不关心物体结构。Feature Reconstruction Loss 从 ImageNet 预训练的 VGG 网络中的其中一个激活层后提取，而 Style Reconstruction Loss 从 VGG 网络的各个激活层中提取。对于风格迁移任务，这两个 Loss 都必不可少，而对于图像超分辨率任务，风格 Loss 便不存在。对于可见光转红外任务，我们可以参考图像超分辨率任务，只保留 Feature Reconstruction Loss，来确保生成图像结构信息。并且需要说明的是预训练的 VGG 不参与参数更新。<br>
+<div align=center><img src="pics/49.png"  width="60%" height="80%"><br>
+<div align=left>
+<br>
+
+### Perceptual Adversarial Networks for Image-to-Image Transformation
+仿照上面文章中的 perceptual loss，将其应用与 GAN 中，生成器中没有用到 cGAN，理由是：cGAN 中生成图像满足的是条件分布 $P_{real}(y|x)$,而没有直接与 ground truth $y_{real}$ 共享同样的特征,而GAN中生成图像和ground truth共享同样的特征。<br>
+<div align=center><img src="pics/50.png"  width="60%" height="80%"><br>
+<div align=left>
+<br>
+Loss 采用了传统 loss 与 Perceptual loss 的加权，并且同时应用于鉴别器和生成器。
+
+### Generating Images with Perceptual Similarity Metrics based on Deep Networks
+本文提出了 Perceptual Loss 在图像编码、变分自编码器以及深度网络层恢复原图像中的应用价值。将 Perceptual Loss 的计算说的更加广义了，提出了一个 Comparator, 来提取目标图像和生成图像的特征，不过这个 Comparator 可以来自生成器/辨别器的一部分，也可以是一个预训练的网络，比如 Alexnet、Exemplar-CNN 等。<br>
+但是仅有 Perceptual Loss 是不足的，因为在encoding 过程中，对于一个 natural image(ground truth)的编码可能对应很多个生成图像的编码，因此我们还需要 GAN loss，来让natural image 和 natural image 的特征空间互相远离。像素级别的 Loss 也是不可缺少的，这有助于对抗生成网络训练的稳定性。<br>
+<div align=center><img src="pics/51.png"  width="40%" height="80%"><br>
+<div align=left>
+<br>
+
+<div align=center><img src="pics/52.png"  width="50%" height="80%"><br>
+<div align=left>
+<br>
+
+
+
+
 ## 特殊传感器实现深度神经网络层
 ### ASP Vision Optically Computing the First Layer of Convolutional Neural Networks using Angle Sensitive Pixels
 >H. Chen, S. Jayasuriya, Y. Yang, "ASP Vision Optically Computing the First Layer of Convolutional Neural Networks using Angle Sensitive Pixels," in 2016 IEEE Conference on Computer Vision and Pattern Recognition, pp. 903-912, 2016.
@@ -375,3 +409,26 @@ ASP对光线入射角度敏感，而不同的入射角在空间频域中对应�
 
 本文向我们介绍了计算机在计算图像卷积时，可以先对卷积核和输入图像进行快速傅里叶变换，二者在频域上的乘积就相当于在空间域的卷积，得到结果后再进行快速傅里叶逆变换转换回空间域，得到卷积后结果。并分析了相应的计算复杂度。
 
+### Perceptual-Sensitive GAN for Generating Adversarial Patches
+本篇文章主要介绍的是信息隐藏/图像识别方面的内容，通过对抗生成网络生成具有分类干扰性的 patch，训练鉴别器对含有 patch 的图像的鉴别能力，同时生成器生成 patch 要迷惑 target model。采用注意力机制确认 patch 的 localization。并且生成的 patch 要与现实情况尽量相关, 见$L_{patch}$。
+<br>
+<div align=center><img src="pics/53.png"  width="60%" height="80%"><br>
+<div align=left>
+<br><div align=center><img src="pics/54.png"  width="60%" height="80%"><br>
+<div align=left>
+<br><div align=center><img src="pics/55.png"  width="60%" height="80%"><br>
+<div align=left>
+<br>
+
+### Perceptual Generative Adversarial Networks for Small Object Detection
+<div align=left>
+<br><div align=center><img src="pics/56.png"  width="80%" height="80%"><br>
+<div align=left>
+<br>
+
+本篇论文提出了一种提高小目标检测精度的思路，小目标往往在目标检测中精度较低，上图提出的结构对小目标特征生成具有很大帮助。首先 (a) 部分，上面的五层卷积神经网络直接提取图像特征，产生 Pooled Features。下面的 Generator 通过引入残差学习中小对象所缺乏的细粒度细节，产生细粒度更高的 Feature。二者进行加和(Elewise-sum)得到Super-Resolved Features。(b)部分中的输入除了刚刚(a)生成的 Super-Resolved Features 还有大目标图像生成的Large Objects Features，上半部分 Adversarial Branch 鉴别器用来分辨这两组 Feature 是来自大目标还是小目标生成的，下面的 Adversarial Branch 通过将生成的 Super-Resolved Features 送入分类器检查分类精度、送入目标检测回归器检查检测精度，即如果生成的 Super-Resolved Features 很接近大目标的 Large Objects Features 的话，两部分鉴别器的分类精度、回归精度应当是很高的。(a)(b)部分对抗学习，最终会使得生成器对小目标产生和大目标类似的特征，进而对小目标检测有所帮助。<br>
+
+我对这篇文章的疑问就是：为什么残差网络能从小目标中提取出类似大目标的特征？
+
+## 超表面(Metasurface)
+>https://www.zhihu.com/question/387332953/answer/1202247084 
