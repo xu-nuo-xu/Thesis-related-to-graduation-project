@@ -25,6 +25,10 @@
         - [Perceptual Losses for Real-Time Style Transfer and Super-Resolution](#perceptual-losses-for-real-time-style-transfer-and-super-resolution)
         - [Perceptual Adversarial Networks for Image-to-Image Transformation](#perceptual-adversarial-networks-for-image-to-image-transformation)
         - [Generating Images with Perceptual Similarity Metrics based on Deep Networks](#generating-images-with-perceptual-similarity-metrics-based-on-deep-networks)
+        - [Progressively Unfreezing Perceptual GAN](#progressively-unfreezing-perceptual-gan)
+        - [PCSGAN: Perceptual Cyclic-Synthesized Generative Adversarial Networks for Thermal and NIR to Visible Image Transformation](#pcsgan-perceptual-cyclic-synthesized-generative-adversarial-networks-for-thermal-and-nir-to-visible-image-transformation)
+        - [Image manipulation with perceptual discriminators](#image-manipulation-with-perceptual-discriminators)
+        - [TV-GAN: Generative Adversarial Network Based Thermal to Visible Face Recognition](#tv-gan-generative-adversarial-network-based-thermal-to-visible-face-recognition)
     - [特殊传感器实现深度神经网络层](#特殊传感器实现深度神经网络层)
         - [ASP Vision Optically Computing the First Layer of Convolutional Neural Networks using Angle Sensitive Pixels](#asp-vision-optically-computing-the-first-layer-of-convolutional-neural-networks-using-angle-sensitive-pixels)
     - [其他](#其他)
@@ -32,6 +36,8 @@
         - [Perceptual-Sensitive GAN for Generating Adversarial Patches](#perceptual-sensitive-gan-for-generating-adversarial-patches)
         - [Perceptual Generative Adversarial Networks for Small Object Detection](#perceptual-generative-adversarial-networks-for-small-object-detection)
     - [超表面(Metasurface)](#超表面metasurface)
+    - [可见光图像与红外图像模态关系专栏](#可见光图像与红外图像模态关系专栏)
+        - [Heterogeneous Face Recognition: Recent Advances in Infrared-to-Visible Matching](#heterogeneous-face-recognition-recent-advances-in-infrared-to-visible-matching)
 
 <!-- /TOC -->
 ## 衍射深度学习框架
@@ -364,6 +370,8 @@ $s_i$表示第i个neural patch的分类得分，N为patch总数。$E_t$表达式
 <br>
 
 ### Perceptual Adversarial Networks for Image-to-Image Transformation
+>C. Wang , C. Xu, C. Wang, "Perceptual adversarial networks for image-to-image transformation," in IEEE Transactions on Image Processing, vol. 27, no. 8 ,pp. 4066-4079, 2018.
+
 仿照上面文章中的 perceptual loss，将其应用与 GAN 中，生成器中没有用到 cGAN，理由是：cGAN 中生成图像满足的是条件分布 $P_{real}(y|x)$,而没有直接与 ground truth $y_{real}$ 共享同样的特征,而GAN中生成图像和ground truth共享同样的特征。<br>
 <div align=center><img src="pics/50.png"  width="60%" height="80%"><br>
 <div align=left>
@@ -381,8 +389,45 @@ Loss 采用了传统 loss 与 Perceptual loss 的加权，并且同时应用于�
 <div align=left>
 <br>
 
+### Progressively Unfreezing Perceptual GAN
 
+<div align=center><img src="pics/57.png"  width="80%" height="80%"><br>
+<div align=left>
+<br>
+本篇文章应用于图像材质细节的生成，贡献主要在于以下几点：<br>
 
+- 提出了一种新的对抗生成网络结构，主要是鉴别器的结构创新，不同于之前perceptual GAN VGG等预训练网络固定参数作为鉴别器，本文鉴别器分为两个部分
+:perceptual feature extractor 和 discriminative learning layers, 前者用于提取生成图像/原图像特征，后者用于鉴别。
+- 鉴别器中 perceptual feature extractor 存在 dense skip connect，各层之间共享前面的特征。这样就算冻结一部分层，梯度也能通过 dense skip connect 传导到生成器部分。
+- 提出一种新的训练 Perceptual GAN 的方式，开始先冻结perceptual feature extractor的参数，即不更新，这样可以使得鉴别器比较“愚蠢”，防止生成器的梯度为 0。之后每训练一个 epoch 通过随机判定是否解冻，依次解冻 perceptual feature extractor 的各层参数(阈值按照文中经验设置为0.66)。这样有助于训练过程稳定。
+- 该 Progressively Unfreezing Perceptual GAN 可用于 unpaired imageto-image translation，通过 perceptual feature extractor 中的参数，衡量生成图像和原图之间的差异。而不是必须 paired 中的 pixel 级别的对比。
+
+该文章对 GAN 稳定训练过程的参考价值很高。
+
+### PCSGAN: Perceptual Cyclic-Synthesized Generative Adversarial Networks for Thermal and NIR to Visible Image Transformation
+叠 Loss 杀人书的文章。在红外转可将光任务中，文中同时考虑了传统 GAN Loss，可见光转红外的 Cycle-GAN 的 L1 Loss和感知Loss，红外转可见光的 Cycle-GAN 的 L1 Loss和感知Loss。整体架构如下：
+<div align=center><img src="pics/58.png"  width="80%" height="80%"><br>
+<div align=left>
+<br>
+个人感觉这就同时把可见光转红外和红外转可见光看成了一个对称的任务，但是从物理上来看这两个应该不是互相可逆的。<br>
+
+本篇文章还有代码(就300来行，Pytorch)，可以参考一下。二区论文。
+
+### Image manipulation with perceptual discriminators
+本篇文章的创新点在于鉴别器使用 Perceptual Loss，不过，相比于之前有的 Perceptual Loss 是从固定参数的预训练 VGG 中提取特征，有的是直接从全训练参数鉴别器中提取特征，本文的鉴别器分为两个部分，一部分参数可训练，一部分不可训练，不可训练的部分来源于 VGG 预训练参数层，从这些层中再用多个卷积块提取不同层次的特征与固定网络参数块结合(stack)，最后加权多个层次预测结果，作为鉴别器结果。<br>
+文中还使用了 Cycle-GAN Loss 使得训练输入数据可以是 unaligned(unpaired)，两个生成器，一个从无表情到笑脸，一个再从笑脸到无表情脸，最后衡量一来一回两个无表情脸的差距。这样一来，鉴别器就可以输入两个unaligned的图像。当生成器生成的笑脸和之前人不匹配时，Cycle-GAN Loss 会比较大；当生成器生成的笑脸不是标准笑脸时，鉴别器 Perceptual Loss 会比较大。
+<div align=center><img src="pics/59.png"  width="80%" height="80%"><br>
+<div align=left>
+<br>
+文中还给我们了一个关于平衡生成器和鉴别器的思路：我们预训练鉴别器是为了让鉴别器在开始时有较强的鉴别能力，防止生成器生成质量不高的照片也能迷惑鉴别器。但有时预训练鉴别器开始就太强，那么我们也可以预训练生成器来增加稳定性(不知道怎么预训练)。
+
+### TV-GAN: Generative Adversarial Network Based Thermal to Visible Face Recognition
+本篇文章利用对抗生成网络实现热红外图像转可将光图像。创新点就在于鉴别器除了鉴别生成的图像是真的还是生成的外，还有一个人物身份识别任务。具体来说，鉴别器采用 cGAN 模式，将原图(热红外图像)也作为输入，将热红外图像与对应的可见光图像(或生成图像)映射为：$X × Y -> \{0,1\}^{N+1}$ 的向量，N 就是数据库中人物的数量，one-hot 编码方式，同一人编码相同，并为生成图像保留一位(即若是生成图像最后一位为 1，其余位为 0)。鉴别器衡量生成的 N+1 维向量的差异，构成 identity loss ：
+<div align=center><img src="pics/60.png"  width="60%" height="80%"><br>
+<div align=left>
+<br><div align=center><img src="pics/61.png"  width="80%" height="80%"><br>
+<div align=left>
+<br>
 
 ## 特殊传感器实现深度神经网络层
 ### ASP Vision Optically Computing the First Layer of Convolutional Neural Networks using Angle Sensitive Pixels
@@ -432,3 +477,10 @@ ASP对光线入射角度敏感，而不同的入射角在空间频域中对应�
 
 ## 超表面(Metasurface)
 >https://www.zhihu.com/question/387332953/answer/1202247084 
+
+## 可见光图像与红外图像模态关系专栏
+
+### Heterogeneous Face Recognition: Recent Advances in Infrared-to-Visible Matching
+本篇文章总结了 2017 年之前，可见光转红外的各种工作。将红外图像分为四类，近红外，短波红外，中红外，远红外。前两者成像主要依靠反射，后二者成像主要依靠物体自身辐射(也成为热红外)。因为前二者的成像原理和可见光类似，因此模态差异不大，后两者成像原理和可见光图像不同，因此模态差异较大，转换难度更大(文中用SSIM简单定量计算了不同模态之间差异性)。最后还提到了 Polarimetric LWIR-to-Visible ，利用偏振光斯托克斯矢量的测量，得到原本 LWIR 中没有的几何和纹理细节，继而有助于模态识别。本文具有指导性意义。
+<br><div align=center><img src="pics/62.png"  width="80%" height="80%"><br>
+<div align=left>
