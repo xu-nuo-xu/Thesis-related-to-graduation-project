@@ -35,9 +35,16 @@
         - [Fast Training of Convolutional Networks through FFTs](#fast-training-of-convolutional-networks-through-ffts)
         - [Perceptual-Sensitive GAN for Generating Adversarial Patches](#perceptual-sensitive-gan-for-generating-adversarial-patches)
         - [Perceptual Generative Adversarial Networks for Small Object Detection](#perceptual-generative-adversarial-networks-for-small-object-detection)
+        - [Face Aging With Identity-Preserved Conditional Generative Adversarial Networks](#face-aging-with-identity-preserved-conditional-generative-adversarial-networks)
+        - [Invertible Conditional GANs for image editing](#invertible-conditional-gans-for-image-editing)
+        - [Face Aging With Identity-Preserved Conditional Generative Adversarial Networks](#face-aging-with-identity-preserved-conditional-generative-adversarial-networks-1)
     - [超表面(Metasurface)](#超表面metasurface)
     - [可见光图像与红外图像模态关系专栏](#可见光图像与红外图像模态关系专栏)
         - [Heterogeneous Face Recognition: Recent Advances in Infrared-to-Visible Matching](#heterogeneous-face-recognition-recent-advances-in-infrared-to-visible-matching)
+        - [Face Matching Between Near Infrared and Visible Light Images](#face-matching-between-near-infrared-and-visible-light-images)
+        - [Transferring Deep Representation for NIR-VIS Heterogeneous Face Recognition](#transferring-deep-representation-for-nir-vis-heterogeneous-face-recognition)
+        - [NIR-VIS Heterogeneous Face Recognition via Cross-Spectral Joint Dictionary Learning and Reconstruction](#nir-vis-heterogeneous-face-recognition-via-cross-spectral-joint-dictionary-learning-and-reconstruction)
+        - [Deep Perceptual Mapping for Cross-Modal Face Recognition](#deep-perceptual-mapping-for-cross-modal-face-recognition)
 
 <!-- /TOC -->
 ## 衍射深度学习框架
@@ -475,12 +482,92 @@ ASP对光线入射角度敏感，而不同的入射角在空间频域中对应�
 
 我对这篇文章的疑问就是：为什么残差网络能从小目标中提取出类似大目标的特征？
 
+### Face Aging With Identity-Preserved Conditional Generative Adversarial Networks
+本篇文章针对的是人脸年龄转换图像生成问题(Face Aging / Age Synthesis/ Age Progression)。文中提到之前的工作框架大致为：先训练一个 Encoder，将图像压缩为一个向量 z，再将带其他年龄信息的向量 x 与 z 结合送入Generator，生成新的带年龄信息人脸，与 Ground Truth 进行 Pixel—Wise Loss 度量，进行参数更新。Encoder 进行下采样过程，Generator进行上采样过程。这样一来虽然能生成带年龄信息的人脸，但人物的身份信息不容易保留(即可能转换为其他人)。<br>
+文中提出的解决方法为优化下采样过程，在下采样过程中尽量保留人物身份信息，即优化向量 z 。可以将生成图像和原图像分别送入一个提前训练好的用于身份识别的 CNN (文中采用“FaceNet” CNN)，衡量二者输出差异(L2)作为损失函数，之后进行参数优化。<br><div align=left>
+<br><div align=center><img src="pics/70.png"  width="80%" height="80%"><br>
+<div align=left>
+<br>
+其实我可以类比这个思想，在pix2pix下采样最后加上白天/黑夜信息，然后切分数据集，白天/黑夜分开进行训练。
+
+### Invertible Conditional GANs for image editing
+本篇文章来自 NIPS ，上面的文章就是借鉴此文章的，作者把条件信息加入生成器和鉴别器中，对原图进行 Editing(Face aging)。并且作者实验后发现在鉴别器的第一层加入条件最为有效。
+<br><div align=center><img src="pics/71.png"  width="80%" height="80%"><br>
+<div align=left>
+<div align=center><img src="pics/72.png"  width="80%" height="80%"><br>
+<div align=left>
+
+### Face Aging With Identity-Preserved Conditional Generative Adversarial Networks
+本篇文章来自 CVPR 与上面的文章也类似，主要不同是条件信息在生成器的开始加入，与输入图像进行拼接。上面文章中条件信息加入到Encoder下采样的最后。并且这篇文章保留的 Identity 信息是上文中没有的。
+<br><div align=center><img src="pics/73.png"  width="80%" height="80%"><br>
+<div align=left>
+
 ## 超表面(Metasurface)
 >https://www.zhihu.com/question/387332953/answer/1202247084 
 
 ## 可见光图像与红外图像模态关系专栏
 
 ### Heterogeneous Face Recognition: Recent Advances in Infrared-to-Visible Matching
-本篇文章总结了 2017 年之前，可见光转红外的各种工作。将红外图像分为四类，近红外，短波红外，中红外，远红外。前两者成像主要依靠反射，后二者成像主要依靠物体自身辐射(也成为热红外)。因为前二者的成像原理和可见光类似，因此模态差异不大，后两者成像原理和可见光图像不同，因此模态差异较大，转换难度更大(文中用SSIM简单定量计算了不同模态之间差异性)。最后还提到了 Polarimetric LWIR-to-Visible ，利用偏振光斯托克斯矢量的测量，得到原本 LWIR 中没有的几何和纹理细节，继而有助于模态识别。本文具有指导性意义。
+本篇文章总结了 2017 年之前，可见光转红外的各种工作。将红外图像分为四类，近红外，短波红外，中红外，远红外。前两者成像主要依靠反射，后二者成像主要依靠物体自身辐射(也成为热红外)。因为前二者的成像原理和可见光类似，因此模态差异不大，后两者成像原理和可见光图像不同，因此模态差异较大，转换难度更大(文中用SSIM简单定量计算了不同模态之间差异性)。最后还提到了 Polarimetric LWIR-to-Visible ，利用偏振光斯托克斯矢量的测量，得到原本 LWIR 中没有的几何和纹理细节，继而有助于模态识别。本文具有指导性意义。文中提到的大多是传统方法。
 <br><div align=center><img src="pics/62.png"  width="80%" height="80%"><br>
 <div align=left>
+
+### Face Matching Between Near Infrared and Visible Light Images
+本文提出了近红外图像与可见光图像匹配的问题。采用传统方法解决：
+
+- PCA、LDA 提取成对近红外图像和可见光图像特征
+- 利用 CCA 寻找两个模态之间的相关性
+- 利用特征回归的相关得分来评价两类特征之间的相似性
+
+**这种传统方法往往只针对小数据集，大数据集计算量过大。**<br>
+文中提到了红外图像成像时受到环境光影响较小、可见光图像成像时受到环境光影响较大。这就是红外图像的优势之一。具体来说，文中用 Lambertian Reflectance Model 为我们说明了影响成像的因素由三部分组成：物体在不同光谱特性下的反射率 $\rho$、物体表面法线 $n=(n_x,n_y,n_z)$、光照方向 $s=(s_x,s_y,s_z)$。而红外和可见光成像主要差异就在 $\rho$ 上。
+
+**PCA：Principle component analysis  主成分分析**<br>它是一个线性变换。这个变换把数据变换到一个新的坐标系统中，使得任何数据投影的第一大方差在第一个坐标(称为第一主成分)上，第二大方差在第二个坐标(第二主成分)上，依次类推。主成分分析经常用于减少数据集的维数，同时保持数据集的对方差贡献最大的特征。
+<br><div align=center><img src="pics/63.png"  width="40%" height="80%"><br>
+<div align=left>
+
+**LDA：Linear Discriminant Analysis 线性判别分析**<br>
+LDA是一种监督学习的降维技术，“投影后类内方差最小，类间方差最大”。
+<br><div align=center><img src="pics/64.png"  width="60%" height="80%"><br>
+<div align=left>
+
+**CCA:典型相关分析canonical correlation analysis**<br>是对互协方差矩阵的一种理解，是利用综合变量对之间的相关关系来反映两组指标之间的整体相关性的多元统计分析方法。它的基本原理是：为了从总体上把握两组指标之间的相关关系，分别在两组变量中提取有代表性的两个综合变量U1和V1（分别为两个变量组中各变量的线性组合），利用这两个综合变量之间的相关关系来反映两组指标之间的整体相关性。<br>
+
+典型相关性分析是用来探索两个多变量（向量）之间之间的关联关系的，这两个多变量来自于一个相同的个体。<br>
+举例来说，我们判定锻炼和健康之间的关系。一方面，我们使用观察一个人的跑步速度，身高体重作为锻炼的指标；另一方面，我们观察一个人的血压血脂等作为健康的指标。我们可以观察二者之间的关联关系。
+
+一般有两个典型的目的：<br>
+Data Reduction：用少量的线性组合来解释两组变量之间的相关作用。<br>
+Data Interpretation：寻找特征值，这些特征值对于解释两个变量集合之间的相互作用十分关键。<br>
+
+### Transferring Deep Representation for NIR-VIS Heterogeneous Face Recognition
+本文通过深度神经网络解决跨模态NIR-VIS人脸识别问题。针对红外-可见光人脸小数据集，文中采用迁移学习的方法，先对网络进行可见光人脸识别的训练，作为先验，之后通过选取 Hard NIR-VIS Triplets 数据进行网络fine-tune，加快模型收敛。<br>文中还提出了一种新的激活函数，对小数据集更加友好，具体形式来自文献[23]。整体网络结构如下：<br><div align=center><img src="pics/65.png"  width="80%" height="80%"><br>
+<div align=left>
+Triplet Loss旨在增大类间距离(后者)，减小类内距离(前者)：<br><div align=center><img src="pics/66.png"  width="60%" height="80%"><br>
+<div align=left>
+关于Hard NIR-VIS Triplets选取方式：
+<br><div align=center><img src="pics/67.png"  width="60%" height="80%"><br>
+<div align=left>
+思考：<br>
+能否从这种跨模态人脸识别任务中得到启示，用深度网络衡量红外模态和可见光模态的高层次特征差异性。其实人脸识别这种任务对两个模态特征对应性要求不是很高，即在识别任务中，只需要网络抓住图像的显著性特征即可，而细节信息不重要(红外和可见光成像异质性)。
+
+### NIR-VIS Heterogeneous Face Recognition via Cross-Spectral Joint Dictionary Learning and Reconstruction
+本文采用 K-SVD 算法，对 NIR、VIS 两个域的数据进行稀疏表示，图像在转换过程中共享稀疏表示 x, 最终实现转换。<br>
+K-SVD我们一般是用在字典学习、稀疏编码方面，它可以认为是K-means的一种扩展，
+
+我们进行K-SVD的目标是要构造一个过完备的矩阵，然后选择最稀疏的系数解使得矩阵可以对其训练集相似的目标向量进行稀疏表示。
+
+就字典学习来说，我们所设计的字典目标要满足（还有第二种情况我们先不考虑）： 
+<br><div align=center><img src="pics/68.png"  width="60%" height="80%"><br>
+<div align=left>
+
+其中Y是你要表示的信号$（n×N）$，$D$是字典，也就是过完备矩阵$（n×K）$，$X$为系数矩阵$（K×N）$。这里需要说明的是$X$与$Y$是按列对应，所表示的含义是字典中的条目（每一列）按照$X_i$为系数进行线性组合，就会得到$Y$。而我们的目的是在已知$X$和$Y$的情况下更新字典来满足上述条件。
+
+https://www.cnblogs.com/salan668/p/3555871.html
+
+通过最后的实验结果我们可以看到，这种传统方法不能实现很好的人物面部细节对应(表情等),并且相比于深度方法 PNSR 很低。但该方法针对的是人脸识别任务，可作为红外图像人脸识别系统前端，即先进行红外转可见光再输入传统人脸识别系统之中，只要身份不出错即可。
+
+### Deep Perceptual Mapping for Cross-Modal Face Recognition
+<div align=center><img src="pics/69.png"  width="80%" height="80%"><br>
+<div align=left>
+本文采用深度神经网络提取热红外图像和可见光图像的特征，并采用均方 Loss 缩小两个域图像的度量差距。Loss 还有一个正则化项用来防止参数爆炸。图像输入采用 Patch 的方式。因为是2015年的论文，可以看到当时的方法还比较单调，但也属于热红外与可见光图像匹配的创新之举。
