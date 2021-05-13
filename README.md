@@ -35,9 +35,10 @@
         - [Fast Training of Convolutional Networks through FFTs](#fast-training-of-convolutional-networks-through-ffts)
         - [Perceptual-Sensitive GAN for Generating Adversarial Patches](#perceptual-sensitive-gan-for-generating-adversarial-patches)
         - [Perceptual Generative Adversarial Networks for Small Object Detection](#perceptual-generative-adversarial-networks-for-small-object-detection)
-        - [Face Aging With Identity-Preserved Conditional Generative Adversarial Networks](#face-aging-with-identity-preserved-conditional-generative-adversarial-networks)
+        - [Face aging with conditional generative adversarial networks](#face-aging-with-conditional-generative-adversarial-networks)
         - [Invertible Conditional GANs for image editing](#invertible-conditional-gans-for-image-editing)
-        - [Face Aging With Identity-Preserved Conditional Generative Adversarial Networks](#face-aging-with-identity-preserved-conditional-generative-adversarial-networks-1)
+        - [Face Aging With Identity-Preserved Conditional Generative Adversarial Networks](#face-aging-with-identity-preserved-conditional-generative-adversarial-networks)
+        - [Single Image Haze Removal Using Dark Channel Prior](#single-image-haze-removal-using-dark-channel-prior)
     - [超表面(Metasurface)](#超表面metasurface)
     - [可见光图像与红外图像模态关系专栏](#可见光图像与红外图像模态关系专栏)
         - [Heterogeneous Face Recognition: Recent Advances in Infrared-to-Visible Matching](#heterogeneous-face-recognition-recent-advances-in-infrared-to-visible-matching)
@@ -45,6 +46,14 @@
         - [Transferring Deep Representation for NIR-VIS Heterogeneous Face Recognition](#transferring-deep-representation-for-nir-vis-heterogeneous-face-recognition)
         - [NIR-VIS Heterogeneous Face Recognition via Cross-Spectral Joint Dictionary Learning and Reconstruction](#nir-vis-heterogeneous-face-recognition-via-cross-spectral-joint-dictionary-learning-and-reconstruction)
         - [Deep Perceptual Mapping for Cross-Modal Face Recognition](#deep-perceptual-mapping-for-cross-modal-face-recognition)
+        - [Real-Time Monitoring of Heart Rate by Processing of Near Infrared Generated Streams](#real-time-monitoring-of-heart-rate-by-processing-of-near-infrared-generated-streams)
+    - [图像生成方法](#图像生成方法)
+        - [Pixel Recurrent Neural Networks](#pixel-recurrent-neural-networks)
+        - [Conditional image generation with PixelCNN decoders](#conditional-image-generation-with-pixelcnn-decoders)
+        - [WAVENET: A GENERATIVE MODEL FOR RAW AUDIO](#wavenet-a-generative-model-for-raw-audio)
+        - [VAE (variational autoencoder)](#vae-variational-autoencoder)
+        - [马尔可夫链生成模型](#马尔可夫链生成模型)
+        - [GAN相比于以上方法的优势和缺点](#gan相比于以上方法的优势和缺点)
 
 <!-- /TOC -->
 ## 衍射深度学习框架
@@ -347,7 +356,9 @@ Cycle-GAN 第二类损失：<br>
 <div align=center><img src="pics/40.png"  width="40%" height="80%"><br>
 <div align=left>
 <br>
-Wasserstein GAN 损失：<br>
+Wasserstein GAN 损失：
+
+https://zhuanlan.zhihu.com/p/25071913<br>
 <div align=center><img src="pics/41.png"  width="40%" height="80%"><br>
 <div align=left>
 <br>
@@ -482,7 +493,7 @@ ASP对光线入射角度敏感，而不同的入射角在空间频域中对应�
 
 我对这篇文章的疑问就是：为什么残差网络能从小目标中提取出类似大目标的特征？
 
-### Face Aging With Identity-Preserved Conditional Generative Adversarial Networks
+### Face aging with conditional generative adversarial networks
 本篇文章针对的是人脸年龄转换图像生成问题(Face Aging / Age Synthesis/ Age Progression)。文中提到之前的工作框架大致为：先训练一个 Encoder，将图像压缩为一个向量 z，再将带其他年龄信息的向量 x 与 z 结合送入Generator，生成新的带年龄信息人脸，与 Ground Truth 进行 Pixel—Wise Loss 度量，进行参数更新。Encoder 进行下采样过程，Generator进行上采样过程。这样一来虽然能生成带年龄信息的人脸，但人物的身份信息不容易保留(即可能转换为其他人)。<br>
 文中提出的解决方法为优化下采样过程，在下采样过程中尽量保留人物身份信息，即优化向量 z 。可以将生成图像和原图像分别送入一个提前训练好的用于身份识别的 CNN (文中采用“FaceNet” CNN)，衡量二者输出差异(L2)作为损失函数，之后进行参数优化。<br><div align=left>
 <br><div align=center><img src="pics/70.png"  width="80%" height="80%"><br>
@@ -501,6 +512,11 @@ ASP对光线入射角度敏感，而不同的入射角在空间频域中对应�
 本篇文章来自 CVPR 与上面的文章也类似，主要不同是条件信息在生成器的开始加入，与输入图像进行拼接。上面文章中条件信息加入到Encoder下采样的最后。并且这篇文章保留的 Identity 信息是上文中没有的。
 <br><div align=center><img src="pics/73.png"  width="80%" height="80%"><br>
 <div align=left>
+
+### Single Image Haze Removal Using Dark Channel Prior
+何凯明经典去雾论文(2009 CVPR 最佳论文)。
+关于公式推导这里不详述，参考原文以及 [[知乎讲解1]](https://zhuanlan.zhihu.com/p/28875405) [[知乎讲解2]](https://zhuanlan.zhihu.com/p/96767081)<br>
+
 
 ## 超表面(Metasurface)
 >https://www.zhihu.com/question/387332953/answer/1202247084 
@@ -571,3 +587,65 @@ https://www.cnblogs.com/salan668/p/3555871.html
 <div align=center><img src="pics/69.png"  width="80%" height="80%"><br>
 <div align=left>
 本文采用深度神经网络提取热红外图像和可见光图像的特征，并采用均方 Loss 缩小两个域图像的度量差距。Loss 还有一个正则化项用来防止参数爆炸。图像输入采用 Patch 的方式。因为是2015年的论文，可以看到当时的方法还比较单调，但也属于热红外与可见光图像匹配的创新之举。
+
+### Real-Time Monitoring of Heart Rate by Processing of Near Infrared Generated Streams
+
+Kinect红外数据实时测心率
+
+## 图像生成方法
+大多数生成模型都遵循最大似然原理，最大似然的基本思想是定义一个由参数 $θ$ 决定的概率分布估计模型，之后我们定义训练样本在此模型下的可能性：<div align=center><img src="pics/77.png"  width="80%" height="80%"><br>
+<div align=left>
+
+式\* 表示一个包含 m 个训练样本 $x^{(i)}$ 的数据集。最大似然原理的目的即选择合适的参数 $θ$ 最小化式\*所述可能性，而在对数空间中我们可以将式\*的乘积形式改写为和的形式，这样更有利于计算机处理，防止下溢等问题出现。：<div align=center><img src="pics/78.png"  width="80%" height="80%"><br>
+<div align=left>
+
+通过对比不同生成模型对最大似然可能性及其梯度计算方式，可以将生成模型分为显式密度模型和隐式密度模型。对于显式密度模型，最大似然的表达非常直接，通常直接定义模型密度函数，将其代入式\*的最大似然可能性表达式，之后计算梯度进行最小化即可。这种模型存在一个问题，即需要根据样本分布进行准确的概率密度表达式设计，并且易于后续最小化最大似然可能性计算。对于隐式密度模型，不用明确定义密度函数形式，通过从生成样本中取样，来间接调整模型对数据分布的控制。下面对常见生成模型进行介绍：
+<div align=center><img src="pics/74.png"  width="80%" height="80%"><br>
+<div align=left>
+
+### Pixel Recurrent Neural Networks
+>https://www.youtube.com/watch?v=-FFveGrG46w
+
+本文属于 Tractable density 的 Fully visible belief networks，主要思想：采用链式法则将一个 $n$ 维向量 $x$ 上的联合分布分解为条件概率分布的乘积，利用神经网络表示数据分布，序列模型往往采用该方法。<div align=center><img src="pics/75.png"  width="50%" height="80%"><br>
+<div align=left>
+Pixel RNN 每次计算生成一个像素点的一个通道值，该生成通道值取决于之前所有生成的像素点各个通道值。神经网络输出各像素点值的似然概率，通过最大化训练样本似然来训练模型。优点在于生成过程较为稳定，每次生成参考了之前所有像素点内容，并且通过显式计算似然概率给出了模型度量评估方式；缺点在于计算速度很慢，一个像素点的生成必须等待之前像素点均生成完毕才能进行。为了提高生成速度，文中还对其进行了变种，借鉴 LSTM 的思想，对之前较远的像素信息进行遗忘处理，提出了Row LSTM，Diagonal BiLSTM 模型。为了同时考虑全局特性和局部信息，提出了 Multi-Scale PixelRNN。<div align=center><img src="pics/76.png"  width="80%" height="80%"><br>
+<div align=left>
+
+### Conditional image generation with PixelCNN decoders
+本文各像素点生成只参考四周的像素而非之前生成的所有像素，因此感受野没有Pixel RNN大，但是网络是全卷积的，没有残差块，因此像素点的生成可以并行处理，大大加快了生成速度。但相比上文感受野范围较小，没有用到更多的上下文信息。
+
+### WAVENET: A GENERATIVE MODEL FOR RAW AUDIO
+>https://www.deepmind.com/blog/article/wavenet-generative-model-raw-audio
+
+本文与上文类似，都采用 Fully visible belief networks，只不过将该思路迁移到了一维的音频信号生成中。并且在音频生成中加入了文本信息指导音频生成的内容，实现 Text-to-Speech，同时还可以在网络中加入说话者身份信息，使得网络学习不同说话者的音色特点。当然，在音乐生成中，也可以不添加任何信息，让网络随机生成轻音乐。
+
+### VAE (variational autoencoder)
+>https://www.youtube.com/watch?v=7Rb4s9wNOmc
+
+>https://zhuanlan.zhihu.com/p/34998569
+
+>https://blog.csdn.net/poulang5786/article/details/80766498
+
+变分自编码器是对自编码器的改进，自编码器往往通过全连接神经网络层或卷积层作为编码器对输入进行压缩编码，生成 n 维潜在空间向量，之后通过解码器上采样对该向量进行重建。而变分自编码器在压缩编码过程中不直接生成 n 维潜在空间向量，而是假定潜在空间向量每一维都服从高斯分布，并生成其均值和方差，从各个高斯分布中进行采样，送入解码器。相比于自编码器，变分自编码器在网络中加入了高斯噪声，使得解码器对噪声具有鲁棒性，并且损失函数中的 KL 散度项相当于对生成器进行了正则化处理，使得潜在空间的分割更加均匀和紧凑。但是，客观上准确拟合样本分布并不等同于主观上图像生成质量好，变分自编码器就存在这样的问题。
+
+<div align=center><img src="pics/79.png"  width="80%" height="80%"><br>
+<div align=left>
+
+### 马尔可夫链生成模型
+>https://blog.csdn.net/weixin_42398658/article/details/84279293
+
+马尔可夫链生成模型的训练过程是通过不断向模型中串行输入样本，更新状态转移参数，最终模型生成样本分布收敛到总体样本分布。如受限玻尔兹曼机 ，其网络节点由可见单元和隐单元构成。可见单元和隐单元都有对应的权值，两部分单元相互连通，并且通过权值表达单元之间的相关性。因为图像信息较为复杂，一层隐含层往往难以表达样本的真实分布，因此目前将其作为深度神经网络的结构单元使用。
+
+这种基于马尔可夫链的模型，有两个缺点：(1)只关注前一状态进行新状态的生成，没有有效利用上下文信息。若考虑更多上下文信息，则需要设定更多的状态，计算量会按指数级增加。(2)收敛过程慢，且没有一个指标可以度量模型是否已经收敛。
+
+### GAN相比于以上方法的优势和缺点
+优势：
+
+- 相比于 PixelRNN 等全可见信念网络，GAN 可以并行生成样本，而非生成时间与生成样本维度 $x$ 成正比。
+- 相比于 VAE 没有变分下界，因为 GAN 目前被认为是通用的分布逼近器且是渐进一致的。
+- GAN 能够生成直观上更加真实的样本，而非仅仅拟合出数据分布。
+- GAN 能够采用无监督的方式训练，可广泛应用于无监督学习和半监督学习。
+
+缺点：
+
+- GAN 训练收敛需要找到纳什均衡，这既需要生成器和鉴别器结构上不能差异太大，又需要训练过程的权衡。
